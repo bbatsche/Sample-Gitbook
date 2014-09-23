@@ -1,0 +1,24 @@
+{
+    "name": "Codeup-Sample-Gitbook",
+    "description": "Sample Gitbook to use as a base for additional book development",
+    "dependencies": {
+        "gitbook": "^1.0.0",
+        "gitbook-plugin-anchors": "^0.3",
+        "gitbook-plugin-jsbin": "^0.0.12",
+        "gitbook-plugin-scrollablecode": "^0.1",
+        "gitbook-plugin-toggle-chapters": "^0.0.1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bbatsche/Sample-Gitbook.git"
+    },
+    "contributors": [
+        "Ben Batschelet <ben@codeup.com>"
+    ],
+    "license": "Proprietary",
+    "private": true,
+    "bugs": {
+        "url": "https://github.com/bbatsche/Sample-Gitbook/issues"
+    },
+    "homepage": "https://github.com/bbatsche/Sample-Gitbook"
+}
