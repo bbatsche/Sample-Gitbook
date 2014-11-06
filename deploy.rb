@@ -8,6 +8,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'aws-sdk'
+require 'git'
 
 # Shamelessly stolen from http://avi.io/blog/2013/12/03/upload-folder-to-s3-recursively
 # Because multithreaded upload is pretty f-ing sweet
@@ -93,9 +94,10 @@ end
 
 # Parse CLI Options
 options = {
-  :bucket => nil,
+  :bucket    => nil,
   :build_dir => 'build',
-  :threads => 8
+  :threads   => 8,
+  :force     => false
 }
 
 parser = OptionParser.new do |opts|
@@ -119,6 +121,10 @@ parser = OptionParser.new do |opts|
     options[:threads] = t
   end
 
+  opts.on('-f', '--force', "Force deployment, even if the working directory is not clean") do |f|
+    options[:force] = f
+  end
+
   opts.on_tail('-h', '--help', 'Display this help') do
     puts opts
     exit
@@ -130,6 +136,16 @@ parser.parse!
 if options[:bucket] == nil
   puts parser
   exit
+end
+
+unless options[:force]
+  repo = Git.open '.'
+
+  [:added, :changed, :deleted, :untracked].each do |s|
+    abort 'Repository status is not clean!' unless repo.status.send(s).empty?
+end
+
+  abort 'Master branch not currently checked out' unless repo.branches['master'].current
 end
 
 # Build book
