@@ -76,7 +76,7 @@ Then in your browser go to http://localhost:4000.
 
 ## Deployment
 
-We use Amazon S3 to host the rendered Gitbook. The `deploy.rb` can automatically compile your book, cleanup a handful of bugs related to how S3 responds to different URLs, and upload it to a specified S3 bucket. At minimum, you will need a bucket name, an authorized access key, and it's corresponding secret. Running `./deploy -h` should get you the following help text:
+We use Amazon S3 to host the rendered Gitbook. The `deploy.rb` can automatically compile your book, cleanup a handful of bugs related to how S3 responds to different URLs, and upload it to a specified S3 bucket. At minimum, you will need a bucket name, an authorized access key, and it's corresponding secret. Running `./deploy.rb -h` should get you the following help text:
 
 ~~~
 Usage: deploy [options]
@@ -85,5 +85,8 @@ Usage: deploy [options]
     -k, --aws_key=KEY                AWS Upload Key (Default: $AWS_ACCESS_KEY_ID)
     -s, --aws_secret=SECRET          AWS Upload Secret (Default: $AWS_SECRET_ACCESS_KEY)
     -t, --threads=THREADS            Number of threads to use for uploading (Default: 8)
+    -f, --force                      Force deployment, even if the working directory is not clean
     -h, --help                       Display this help
 ~~~
+
+As a safety check, `deploy.rb` will **not** push to S3 unless you are currently on the master branch, and all your changes are committed. You can override this option by passing the `-f` flag, but you'd better have a good reason for doing so!
