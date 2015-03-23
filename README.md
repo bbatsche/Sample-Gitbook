@@ -43,10 +43,10 @@ git submodule update
 
 This will configure the submodule settings for your checkout and then clone the current commit of our curriculum content.
 
-Note: The above process can be simplified by passing the flag `--recursive` to the `git clone` command:
+**Note:** The above process can be simplified by passing the flag `--recursive` to the `git clone` command:
 
 ```bash
-git clone --recursive <repository-url> <local-directory>
+git clone --recursive [repository-url] [local-directory]
 ```
 
 ### Repository File Structure
