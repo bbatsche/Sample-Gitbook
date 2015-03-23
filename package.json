@@ -3,7 +3,7 @@
     "description": "Sample Gitbook to use as a base for additional book development",
     "dependencies": {
         "gitbook": "^1.0.0",
-        "gitbook-plugin-anchors": "^0.3",
+        "gitbook-plugin-anchors": "^0.4",
         "gitbook-plugin-jsbin": "^0.0.12",
         "gitbook-plugin-scrollablecode": "^0.1",
         "gitbook-plugin-toggle-chapters": "^0.0.1"
