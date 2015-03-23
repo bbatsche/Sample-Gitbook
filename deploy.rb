@@ -92,6 +92,7 @@ class S3FolderUpload
   end
 end
 
+# Not sure if the check is *really* necessary, but doesn't hurt
 def git_checkout(repo, branch_name)
   repo.branches[branch_name].checkout unless repo.branches[branch_name].current
 end
@@ -147,6 +148,7 @@ if options[:bucket] == nil
   exit
 end
 
+# Make sure repository is clean before doing build
 repo = Git.open '.'
 
 unless options[:force]
@@ -155,11 +157,9 @@ unless options[:force]
   end
 end
 
+# Save previous branch and checkout specified branch from options
 original_branch = repo.current_branch
-
 git_checkout(repo, options[:branch])
-
-# abort 'Master branch not currently checked out' unless repo.branches['master'].current
 
 # Build book
 system "gitbook build -o \"#{options[:build_dir]}\" -f site content"
@@ -185,7 +185,8 @@ uploader = S3FolderUpload.new(options[:build_dir], options[:bucket])
 uploader.upload! options[:threads]
 uploader.cleanup!
 
-# Cleanup
+# Cleanup build directory
 FileUtils.remove_entry_secure options[:build_dir]
 
+# Switch back to the original branch
 git_checkout(repo, original_branch)
