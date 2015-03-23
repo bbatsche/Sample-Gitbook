@@ -188,5 +188,8 @@ uploader.cleanup!
 # Cleanup build directory
 FileUtils.remove_entry_secure options[:build_dir]
 
+# Tag with bucket name & date deployed.
+repo.add_tag(options[:bucket] + "@" + Time.new.strftime("%Y-%m-%d"))
+
 # Switch back to the original branch
 git_checkout(repo, original_branch)
