@@ -10,27 +10,44 @@ If you're just getting started writing a Gitbook, there's a handful of commandli
 
 Gitbook is written using [Node.js](http://nodejs.org), so first things first you'll need to install this utility. If you're on a Mac using Homebrew you can run the following command:
 
-~~~
+~~~bash
 brew install node
 ~~~
 
 Once you have node installed, install `gitbook` using `npm` (depending on your setup, this may need to be done using `sudo`)
 
-~~~
+~~~bash
 npm install -g gitbook
 ~~~
 
 Once `gitbook` is installed, you will need to also install the repository plugins. These plugins are managed using the `package.json` file (more on this in a second). Install these by running the following from within this directory:
 
-~~~
+~~~bash
 npm install
 ~~~
 
 Finally, the deployment script is written in Ruby and requires a couple of gems to run. You can install these using Bundler:
 
-~~~
+~~~bash
 bundle install
 ~~~
+
+### Setting up Submodules
+
+In order to consolidate our curriculum content, we store it all in a separate repository and include it here as a submodule. Typically, this submodule is stored under `book/content`. If you have just cloned this repository, you will probably need to pull these files into your repo as well. In order to do that, run the following Git commands:
+
+```bash
+git submodule init
+git submodule update
+```
+
+This will configure the submodule settings for your checkout and then clone the current commit of our curriculum content.
+
+Note: The above process can be simplified by passing the flag `--recursive` to the `git clone` command:
+
+```bash
+git clone --recursive <repository-url> <local-directory>
+```
 
 ### Repository File Structure
 
@@ -41,16 +58,17 @@ This repository contains some basic utilities and configuration options that I t
 - `deploy.rb` &mdash; Ruby script to compile your Gitbook and push it out to Amazon S3; more on this below.
 - `Gemfile` & `Gemfile.lock`&mdash; Ruby gem settings for `deploy.rb`
 - `package.json` &mdash; Node.js settings and dependencies for your Gitbook. Although it would be good to change these to reflect your project for the most part it isn't strictly necessary. What you should check however, is the `dependecies` object. This is where you can add or remove additional Gitbook plugins and have them installed for you automatically by using `npm`. You can find additional plugins using something similar to
-    ~~~
+    ~~~bash
     npm search gitbook
     ~~~
-- `content` &mdash; This is where all the content of your Gitbook will go. Anything added to this directory will be included in the compiled book, and any markdown file will be rendered as HTML.
+- `book` &mdash; This is where all the content of your Gitbook will go. Anything added to this directory will be included in the compiled book, and any markdown file will be rendered as HTML.
     - `.bookignore` &mdash; Files to be excluded from the compiled book; by default only ignores the `_book` directory `gitbook` uses for serving the dev site.
     - `.htpasswd` &mdash; Default passwords for use with [s3auth](http://www.s3auth.com). Includes the `codeup` and `codeupe-staff` users
     - `book.json` &mdash; Properties and settings for your book. In particular, look at:
         - `title` & `description` &mdash; Your book's title and description, **do** modify these values
         - `plugins` &mdash; Some default Gitbook plugs we commonly use; after installing your new plugins using `npm` you will need to add them here to enable them in your book. We also disable the default MathJax plugin as it causes conflicts with our code samples
         - `links` &mdash; Disables all the default sharing links and adds a couple of extra links to the sidebar for us
+    - `content` &mdash; Curriculum content, included as a submodule of this repository
     - `cover.jpg` & `cover_small.jpg` &mdash; A simple default cover for your book.
     - `GLOSSARY.md` &mdash; An empty glossary file for your book, see the [documentation](https://github.com/GitbookIO/gitbook#glossary)
     - `README.md` &mdash; An empty landing page; this will be the introduction for your book
@@ -69,7 +87,7 @@ Github has created a GUI tool for editing & writing Gitbooks. It looks very nice
 To view your Gitbook use the `gitbook` commandline tool. From within this directory run:
 
 ~~~
-gitbook serve content
+gitbook serve book
 ~~~
 
 Then in your browser go to http://localhost:4000.
@@ -82,6 +100,7 @@ We use Amazon S3 to host the rendered Gitbook. The `deploy.rb` can automatically
 Usage: deploy [options]
     -b, --bucket=BUCKET              S3 Bucket to deploy to (REQUIRED)
     -o, --output_dir=DIRECTORY       Build directory (Default: "build")
+    -B, --branch=BRANCH              Checkout specified branch before building (Default: "master")
     -k, --aws_key=KEY                AWS Upload Key (Default: $AWS_ACCESS_KEY_ID)
     -s, --aws_secret=SECRET          AWS Upload Secret (Default: $AWS_SECRET_ACCESS_KEY)
     -t, --threads=THREADS            Number of threads to use for uploading (Default: 8)
@@ -89,4 +108,4 @@ Usage: deploy [options]
     -h, --help                       Display this help
 ~~~
 
-As a safety check, `deploy.rb` will **not** push to S3 unless you are currently on the master branch, and all your changes are committed. You can override this option by passing the `-f` flag, but you'd better have a good reason for doing so!
+The script is designed to deploy a given branch of your repository; by default `master`. If you specify a different branch, `deploy.rb` will attempt to checkout this other branch, run the deployment, and then switch back to the previous branch. As an additional safety check, `deploy.rb` will **not** push to S3 unless all your changes are committed. You can override this option by passing the `-f` flag, but you'd better have a good reason for doing so! Finally, once deployment is complete, `deploy.rb` will tag your repository with `[bucket.name]@[date]` so that we can track what versions of our material have been deployed, and to where.
