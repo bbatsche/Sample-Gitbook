@@ -162,7 +162,7 @@ original_branch = repo.current_branch
 git_checkout(repo, options[:branch])
 
 # Build book
-system "gitbook build -o \"#{options[:build_dir]}\" -f site content"
+system "gitbook build -o \"#{options[:build_dir]}\" -f site book"
 
 # Strip double slashes
 gitbook_css = File.join(options[:build_dir], 'gitbook', '*.css')
