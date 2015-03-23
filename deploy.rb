@@ -97,7 +97,8 @@ options = {
   :bucket    => nil,
   :build_dir => 'build',
   :threads   => 8,
-  :force     => false
+  :force     => false,
+  :branch    => 'master'
 }
 
 parser = OptionParser.new do |opts|
@@ -107,6 +108,10 @@ parser = OptionParser.new do |opts|
 
   opts.on('-o', '--output_dir=DIRECTORY', "Build directory (Default: \"#{options[:build_dir]}\")") do |o|
     options[:build_dir] = o
+  end
+
+  opts.on('-B', '--branch=BRANCH', "Checkout specified branch before building (Default: \"#{options[:branch]}\")") do |br|
+    options[:branch] = br
   end
 
   opts.on('-k', '--aws_key=KEY', 'AWS Upload Key (Default: $AWS_ACCESS_KEY_ID)') do |k|
@@ -138,15 +143,19 @@ if options[:bucket] == nil
   exit
 end
 
-unless options[:force]
-  repo = Git.open '.'
+repo = Git.open '.'
 
+unless options[:force]
   [:added, :changed, :deleted, :untracked].each do |s|
     abort 'Repository status is not clean!' unless repo.status.send(s).empty?
+  end
 end
 
-  abort 'Master branch not currently checked out' unless repo.branches['master'].current
-end
+original_branch = repo.branch
+
+repo.branches[options[:branch]].checkout unless repo.branches[options[:branch]].current
+
+# abort 'Master branch not currently checked out' unless repo.branches['master'].current
 
 # Build book
 system "gitbook build -o \"#{options[:build_dir]}\" -f site content"
@@ -174,3 +183,5 @@ uploader.cleanup!
 
 # Cleanup
 FileUtils.remove_entry_secure options[:build_dir]
+
+original_branch.checkout unless original_branch.current
