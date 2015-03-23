@@ -46,7 +46,7 @@ This will configure the submodule settings for your checkout and then clone the 
 **Note:** The above process can be simplified by passing the flag `--recursive` to the `git clone` command:
 
 ```bash
-git clone --recursive [repository-url] [local-directory]
+git clone --recursive [repository-url] [directory]
 ```
 
 ### Repository File Structure
