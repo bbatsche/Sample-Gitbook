@@ -92,6 +92,10 @@ class S3FolderUpload
   end
 end
 
+def git_checkout(repo, branch_name)
+  repo.branches[branch_name].checkout unless repo.branches[branch_name].current
+end
+
 # Parse CLI Options
 options = {
   :bucket    => nil,
@@ -151,9 +155,9 @@ unless options[:force]
   end
 end
 
-original_branch = repo.branch
+original_branch = repo.current_branch
 
-repo.branches[options[:branch]].checkout unless repo.branches[options[:branch]].current
+git_checkout(repo, options[:branch])
 
 # abort 'Master branch not currently checked out' unless repo.branches['master'].current
 
@@ -184,4 +188,4 @@ uploader.cleanup!
 # Cleanup
 FileUtils.remove_entry_secure options[:build_dir]
 
-original_branch.checkout unless original_branch.current
+git_checkout(repo, original_branch)
